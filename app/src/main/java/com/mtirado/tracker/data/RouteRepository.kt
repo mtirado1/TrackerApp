@@ -1,6 +1,5 @@
 package com.mtirado.tracker.data
 
-import androidx.annotation.WorkerThread
 import com.mtirado.tracker.domain.route.Route
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -11,13 +10,21 @@ class RouteRepository(private val routeDao: RouteDao) {
     fun getRouteById(id: String): Flow<Route?> {
         return routeDao.getRouteById(id).map { entity ->
             if (entity != null) {
-                entityToRoute(entity!!)
+                entityToRoute(entity)
             } else { null }
         }
     }
 
+    fun deleteRoute(id: String) {
+        Thread {
+            routeDao.deleteRoute(id)
+        }.start()
+    }
+
     fun insert(route: Route) {
-        routeDao.insert(routeToEntity(route))
+        Thread {
+            routeDao.insert(routeToEntity(route))
+        }.start()
     }
 
     companion object {

@@ -43,9 +43,7 @@ class RouteMonitorFragment: Fragment() {
         binding.buttonEnd.setOnClickListener {
             routeMonitor.end()?.let { route ->
                 val repository = (activity as MainActivity).repository
-                Thread {
-                    repository.insert(route)
-                }.start()
+                repository.insert(route)
                 findNavController().navigate(RouteMonitorFragmentDirections.endRoute())
             }
         }

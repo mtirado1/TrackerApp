@@ -24,6 +24,10 @@
         <argument
             android:name="routeId"
             app:argType="string" />
+        <action
+            android:id="@+id/deleteRoute"
+            app:destination="@id/routeListFragment"
+            app:popUpTo="@id/routeListFragment" />
     </fragment>
     <fragment
         android:id="@+id/routeCreationFragment"
