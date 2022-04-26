@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/routeListFragment">
+
+    <fragment
+        android:id="@+id/routeListFragment"
+        android:name="com.mtirado.tracker.fragments.RouteListFragment"
+        android:label="My Routes"
+        tools:layout="@layout/fragment_route_list">
+        <action
+            android:id="@+id/action_routeList_to_routeDetails"
+            app:destination="@id/routeDetailsFragment" />
+        <action
+            android:id="@+id/action_routeList_to_routeCreation"
+            app:destination="@id/routeCreationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/routeDetailsFragment"
+        android:name="com.mtirado.tracker.fragments.RouteDetailsFragment"
+        android:label="Details">
+        <argument
+            android:name="routeId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/routeCreationFragment"
+        android:name="com.mtirado.tracker.fragments.RouteCreationFragment"
+        android:label="New Route">
+        <action
+            android:id="@+id/action_routeCreation_to_routeMonitor"
+            app:destination="@id/routeMonitorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/routeMonitorFragment"
+        android:name="com.mtirado.tracker.fragments.RouteMonitorFragment"
+        android:label="Current">
+        <action
+            android:id="@+id/end_route"
+            app:popUpTo="@id/routeListFragment" />
+        <argument
+            android:name="routeName"
+            app:argType="string" />
+        <argument
+            android:name="logInterval"
+            app:argType="integer" />
+    </fragment>
+</navigation>
