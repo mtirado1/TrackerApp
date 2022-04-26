@@ -11,6 +11,7 @@ import com.mtirado.tracker.MainActivity
 import com.mtirado.tracker.databinding.FragmentRouteDetailsBinding
 import com.mtirado.tracker.domain.formatters.UnitsFormatter
 import com.mtirado.tracker.domain.formatters.DistanceUnits
+import com.mtirado.tracker.domain.formatters.SpeedUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
 
 class RouteDetailsFragment: Fragment() {
@@ -41,10 +42,18 @@ class RouteDetailsFragment: Fragment() {
 
     private fun updateDetails(route: Route) {
         val unit = DistanceUnits.KILOMETERS
+        val speedUnit = SpeedUnits.KILOMETERS_PER_HOUR
         binding.title.text = route.name
         binding.distance.text = UnitsFormatter().format(route.path.distance, unit)
         binding.distanceUnit.text = unit.toString()
+
         binding.duration.text = TimeFormatter().format(route.path.duration)
+
+        binding.averageSpeed.text = UnitsFormatter().format(route.path.speed, speedUnit)
+        binding.averageSpeedUnit.text = speedUnit.toString()
+
+        binding.maxSpeed.text = UnitsFormatter().format(route.path.maxSpeed() ?: 0.0, speedUnit)
+        binding.maxSpeedUnit.text = speedUnit.toString()
     }
 
     override fun onDestroyView() {
