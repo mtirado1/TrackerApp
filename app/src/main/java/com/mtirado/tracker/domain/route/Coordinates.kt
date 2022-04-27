@@ -26,6 +26,9 @@ class Coordinates (
         return sin * sin
     }
 
+    val latitudeString: String get() = CoordinatesFormatter().formatLatitude(this.latitude)
+    val longitudeString: String get() = CoordinatesFormatter().formatLongitude(this.longitude)
+
     override fun toString(): String {
         return CoordinatesFormatter().format(this)
     }

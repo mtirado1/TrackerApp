@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 @Database(entities = arrayOf(RouteEntity::class), version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-public abstract class RoutesDatabase : RoomDatabase() {
+abstract class RoutesDatabase : RoomDatabase() {
     abstract fun routesDao(): RouteDao
 
     companion object {

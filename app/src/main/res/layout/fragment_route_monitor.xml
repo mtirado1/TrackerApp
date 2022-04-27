@@ -20,7 +20,9 @@
             android:id="@+id/route_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Route Name" />
+            android:text="Route Name"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/running_time"
@@ -28,7 +30,9 @@
             android:layout_height="wrap_content"
             android:text="01:10:09"
             android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display3" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/status"
@@ -51,36 +55,78 @@
                     android:id="@+id/label_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:text="Distance"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-                <TextView
-                    android:id="@+id/distance"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="90 km"
-                    android:textAlignment="viewStart"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-            </TableRow>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="90.23"
+                        android:textAlignment="viewEnd"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                        android:textColor="?android:attr/textColorPrimary" />
+
+                    <TextView
+                        android:id="@+id/distance_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="km"
+                        android:textAlignment="viewStart"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                </LinearLayout>
+            </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/label_coordinates"
+                    android:id="@+id/label_latitude"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Coordinates"
+                    android:layout_weight="1"
+                    android:text="Latitude"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
-                    android:id="@+id/coordinates"
+                    android:id="@+id/latitude"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TextView"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAlignment="viewEnd"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    tools:text="30°20'10&quot; N" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/label_longitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Longitude"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/longitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView"
+                    android:textAlignment="viewEnd"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     tools:text="30N 50W" />
             </TableRow>
 
@@ -93,6 +139,7 @@
                     android:id="@+id/label_elevation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Elevation"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
@@ -101,6 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="430 m"
+                    android:textAlignment="viewEnd"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             </TableRow>
@@ -120,13 +168,15 @@
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Speed (Now)" />
 
                 <TextView
                     android:id="@+id/instant_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3.4 km/h" />
+                    android:text="3.4 km/h"
+                    android:textAlignment="viewEnd" />
             </TableRow>
 
             <TableRow
@@ -137,13 +187,15 @@
                     android:id="@+id/textView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Speed (Average)" />
 
                 <TextView
                     android:id="@+id/average_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10.4 km/h" />
+                    android:text="10.4 km/h"
+                    android:textAlignment="viewEnd" />
             </TableRow>
 
         </TableLayout>
@@ -155,25 +207,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal"
+            android:gravity="fill_horizontal"
+            android:layout_marginHorizontal="20dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
                 android:text="STOP" />
 
             <Button
                 android:id="@+id/button_resume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
                 android:text="RESUME" />
 
             <Button
                 android:id="@+id/button_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
                 android:text="END" />
 
         </LinearLayout>

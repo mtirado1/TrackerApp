@@ -8,8 +8,8 @@ import android.location.Location
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.mtirado.tracker.LocationService
 import com.mtirado.tracker.domain.route.*
+import com.mtirado.tracker.service.LocationService
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.*
 import java.util.*

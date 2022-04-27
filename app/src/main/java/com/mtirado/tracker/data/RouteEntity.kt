@@ -1,8 +1,6 @@
 package com.mtirado.tracker.data
 
-import android.content.Context
 import androidx.room.*
-import com.google.gson.Gson
 import com.mtirado.tracker.domain.route.Path
 
 @Entity(tableName = "routes")

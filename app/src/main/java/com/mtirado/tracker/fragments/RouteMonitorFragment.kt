@@ -38,8 +38,17 @@ class RouteMonitorFragment: Fragment() {
         routeMonitor.routeObservable.subscribe(this::updateDetails)
         binding.runningTime.text = "--:--:--"
 
-        binding.buttonStop.setOnClickListener { routeMonitor.stop() }
-        binding.buttonResume.setOnClickListener { routeMonitor.resume() }
+        showStopButton()
+        binding.buttonStop.setOnClickListener {
+            showEndButton()
+            routeMonitor.stop()
+        }
+
+        binding.buttonResume.setOnClickListener {
+            showStopButton()
+            routeMonitor.resume()
+        }
+
         binding.buttonEnd.setOnClickListener {
             routeMonitor.end()?.let { route ->
                 val repository = (activity as MainActivity).repository
@@ -51,7 +60,6 @@ class RouteMonitorFragment: Fragment() {
         arguments?.let {
             val routeName = it.getString("routeName") ?: "New Route"
             val logInterval = it.getInt("logInterval")
-
             if (!routeMonitor.isRunning) {
                 routeMonitor.start(Route.create(routeName), logInterval)
             }
@@ -65,12 +73,25 @@ class RouteMonitorFragment: Fragment() {
             status.text = "STATUS: ${if (routeMonitor.isRunning) "RUNNING" else "STOPPED"}"
 
             distance.text = unitFormatter.format(route.path.distance, DistanceUnits.KILOMETERS)
-            coordinates.text = route.lastPosition?.toString() ?: "- -"
+            latitude.text = route.lastPosition?.latitudeString ?: "- -"
+            longitude.text = route.lastPosition?.longitudeString ?: "- -"
             elevation.text = unitFormatter.format(route.lastPosition?.altitude ?: 0.0, DistanceUnits.METERS)
 
             instantSpeed.text = formatSpeed(route.path.instantSpeed)
             averageSpeed.text = formatSpeed(route.path.speed)
         }
+    }
+
+    private fun showStopButton() {
+        binding.buttonStop.visibility = View.VISIBLE
+        binding.buttonResume.visibility = View.GONE
+        binding.buttonEnd.visibility = View.GONE
+    }
+
+    private fun showEndButton() {
+        binding.buttonStop.visibility = View.GONE
+        binding.buttonResume.visibility = View.VISIBLE
+        binding.buttonEnd.visibility = View.VISIBLE
     }
 
     private fun formatSpeed(speed: Double): String {
