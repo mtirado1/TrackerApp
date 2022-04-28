@@ -46,6 +46,7 @@ class RouteListFragment: Fragment() {
         })
 
         binding.activeRoute.activeRoute.visibility = View.GONE
+        binding.newRouteButton.visibility = View.VISIBLE
         binding.activeRoute.activeRoute.setOnClickListener {
             findNavController().navigate(RouteListFragmentDirections.viewActiveRoute())
         }
@@ -67,6 +68,7 @@ class RouteListFragment: Fragment() {
             binding.activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_media_pause)
         }
         binding.activeRoute.activeRoute.visibility = View.VISIBLE
+        binding.newRouteButton.visibility = View.GONE
         val unit = DistanceUnits.KILOMETERS
         binding.activeRoute.title.text = route.name
         binding.activeRoute.distance.text = UnitsFormatter().format(route.path.distance, unit)
