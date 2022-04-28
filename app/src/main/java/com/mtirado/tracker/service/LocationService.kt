@@ -8,4 +8,8 @@ class LocationService: Service() {
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
 }

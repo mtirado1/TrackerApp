@@ -3,26 +3,42 @@ package com.mtirado.tracker.fragments
 import com.mtirado.tracker.domain.route.Route
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.mtirado.tracker.MainActivity
+import com.mtirado.tracker.R
 import com.mtirado.tracker.databinding.FragmentRouteMonitorBinding
 import com.mtirado.tracker.domain.RouteMonitor
 import com.mtirado.tracker.domain.formatters.DistanceUnits
 import com.mtirado.tracker.domain.formatters.SpeedUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
 import com.mtirado.tracker.domain.formatters.UnitsFormatter
+import io.reactivex.disposables.Disposable
 
 class RouteMonitorFragment: Fragment() {
     private var _binding: FragmentRouteMonitorBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var routeMonitor: RouteMonitor
+    private lateinit var subscription: Disposable
 
     private val unitFormatter = UnitsFormatter()
     private val timeFormatter = TimeFormatter()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val callback = object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigate(RouteMonitorFragmentDirections.endRoute())
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,12 +46,13 @@ class RouteMonitorFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentRouteMonitorBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         routeMonitor = (activity as MainActivity).monitor
-        routeMonitor.routeObservable.subscribe(this::updateDetails)
+        subscription = routeMonitor.routeObservable.subscribe(this::updateDetails)
         binding.runningTime.text = "--:--:--"
 
         showStopButton()
@@ -60,8 +77,13 @@ class RouteMonitorFragment: Fragment() {
         arguments?.let {
             val routeName = it.getString("routeName") ?: "New Route"
             val logInterval = it.getInt("logInterval")
-            if (!routeMonitor.isRunning) {
-                routeMonitor.start(Route.create(routeName), logInterval)
+            val currentlyActive = it.getBoolean("active")
+            if (!currentlyActive) {
+                val newRoute = Route.create(routeName)
+                updateDetails(newRoute)
+                routeMonitor.start(newRoute, logInterval)
+            } else if (routeMonitor.last != null) {
+                updateDetails(routeMonitor.last!!)
             }
         }
     }
@@ -99,5 +121,18 @@ class RouteMonitorFragment: Fragment() {
             return "- -"
         }
         return unitFormatter.format(speed, SpeedUnits.KILOMETERS_PER_HOUR)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        subscription.dispose()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            findNavController().navigate(RouteMonitorFragmentDirections.endRoute())
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

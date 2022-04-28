@@ -14,7 +14,7 @@ class RouteCreationFragment: Fragment() {
     private val binding get() = _binding!!
 
     private var routeName: String = "New Route"
-    private var logInterval: Int = 5
+    private var logInterval: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

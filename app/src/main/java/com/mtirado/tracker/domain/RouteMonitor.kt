@@ -4,22 +4,24 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
+import android.os.Looper
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.mtirado.tracker.domain.route.*
 import com.mtirado.tracker.service.LocationService
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.*
-import java.util.*
 
-class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity: Activity) : Monitor<Route> {
+class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity: Activity) : Monitor<Route>, LocationCallback() {
     private var route: Route? = null
     private var running = false
     private var interval: Int = 1
-    private var currentJob: Job? = null
-    private var cancellationTokenSource = CancellationTokenSource()
+
+    val last: Route? get() = if(running) route else null
+
+    private lateinit var locationRequest: LocationRequest
 
     override val routeObservable: PublishSubject<Route> = PublishSubject.create()
     override val isRunning: Boolean get() = running
@@ -29,26 +31,55 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
         if (!running) {
             running = true
             route = value
-            logData()
+
+            locationRequest = LocationRequest.create().apply {
+                interval = (intervalInSeconds * 1000).toLong()
+                fastestInterval = 1000
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+            }
             startService()
         }
     }
 
+
+    override fun onLocationResult(result: LocationResult) {
+        val location = result.lastLocation
+        if (!running) return
+        val coordinates = Coordinates(
+            latitude = Angle(location.latitude),
+            longitude = Angle(location.longitude),
+            altitude = location.altitude,
+            timestamp = location.time
+        )
+
+        println("RESULT: $coordinates")
+        this.route?.let { route ->
+            val last = route.lastPosition
+            if (last == null) {
+                route.path.add(coordinates)
+                routeObservable.onNext(route)
+            } else {
+                if (last.timestamp != coordinates.timestamp) {
+                    route.path.add(coordinates)
+                    routeObservable.onNext(route)
+                }
+            }
+        }
+    }
+
     private fun startService() {
-        val context = activity.applicationContext
-        val intent = Intent(context, LocationService::class.java)
-        context.startService(intent)
+        val intent = Intent(activity, LocationService::class.java)
+        startLocationUpdates()
+        activity.startService(intent)
     }
 
     private fun stopService() {
-        val context = activity.applicationContext
-        val intent = Intent(context, LocationService::class.java)
-        context.stopService(intent)
+        val intent = Intent(activity, LocationService::class.java)
+        activity.stopService(intent)
     }
 
     override fun resume() {
         running = true
-        logData()
     }
 
     override fun stop()  {
@@ -60,38 +91,12 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
 
     override fun end(): Route? {
         running = false
+        locationClient.removeLocationUpdates(this)
         stopService()
         return route
     }
 
-    private fun makeJob(intervalInSeconds: Int): Job {
-        return MainScope().launch {
-            while(running) {
-                route?.let { route ->
-                    getPosition { coordinates ->
-                        val last = route.lastPosition
-                        if (last == null) {
-                            route.path.add(coordinates)
-                            routeObservable.onNext(route)
-                        }
-                        else {
-                            if (last.timestamp != coordinates.timestamp) {
-                                route.path.add(coordinates)
-                                routeObservable.onNext(route)
-                            }
-                        }
-                    }
-                }
-                delay((intervalInSeconds * 1000).toLong())
-            }
-        }
-    }
-
-    private fun logData() {
-        currentJob = makeJob(this.interval)
-    }
-
-    private fun getPosition(callback: (Coordinates) -> Unit) {
+    private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 locationClient.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -100,7 +105,6 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-
             activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE)
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -111,25 +115,11 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        locationClient.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, cancellationTokenSource.token)
-            .addOnSuccessListener { location: Location? ->
-            location?.let {
-                println("LOG! ${Date(location.time)}")
-                callback(
-                    Coordinates(
-                        Angle(location.latitude),
-                        Angle(location.longitude),
-                        location.time,
-                        location.altitude
-                    )
-                )
-            }
-        }
+        println("Start requesting")
+        locationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
     }
 
     companion object {
         private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
-        private const val PRIORITY_BALANCED_POWER_ACCURACY = 102
-        private const val PRIORITY_HIGH_ACCURACY = 100
     }
 }

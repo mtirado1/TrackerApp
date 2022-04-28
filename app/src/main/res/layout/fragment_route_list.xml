@@ -6,12 +6,23 @@
     android:id="@+id/route_list_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/route_list"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
-        android:scrollbars="vertical" />
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/active_route"
+            layout="@layout/active_route" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/route_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            app:layoutManager="LinearLayoutManager" />
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

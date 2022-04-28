@@ -16,6 +16,19 @@
         <action
             android:id="@+id/action_routeList_to_routeCreation"
             app:destination="@id/routeCreationFragment" />
+        <action
+            android:id="@+id/viewActiveRoute"
+            app:destination="@id/routeMonitorFragment" >
+            <argument
+                android:name="routeName"
+                android:defaultValue="null" />
+            <argument
+                android:name="logInterval"
+                android:defaultValue="0" />
+            <argument
+                android:name="active"
+                android:defaultValue="true" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/routeDetailsFragment"
@@ -35,7 +48,11 @@
         android:label="New Route">
         <action
             android:id="@+id/action_routeCreation_to_routeMonitor"
-            app:destination="@id/routeMonitorFragment" />
+            app:destination="@id/routeMonitorFragment" >
+            <argument
+                android:name="active"
+                android:defaultValue="false" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/routeMonitorFragment"
@@ -50,5 +67,9 @@
         <argument
             android:name="logInterval"
             app:argType="integer" />
+        <argument
+            android:name="active"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 </navigation>
