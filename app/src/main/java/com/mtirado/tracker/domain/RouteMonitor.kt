@@ -19,7 +19,7 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
     private var running = false
     private var interval: Int = 1
 
-    val last: Route? get() = if(running) route else null
+    val last: Route? get() = route
 
     private lateinit var locationRequest: LocationRequest
 
@@ -93,7 +93,9 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
         running = false
         locationClient.removeLocationUpdates(this)
         stopService()
-        return route
+        val endValue = route
+        route = null
+        return endValue
     }
 
     private fun startLocationUpdates() {

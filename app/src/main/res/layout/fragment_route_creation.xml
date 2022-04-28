@@ -26,7 +26,11 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:minHeight="48dp"
-            android:text="New Route" />
+            android:text="New Route"
+            android:textAllCaps="false"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:typeface="normal" />
 
         <TextView
             android:id="@+id/textView2"
@@ -40,9 +44,13 @@
             android:id="@+id/text_log_interval"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="60dp"
             android:ems="10"
             android:inputType="number"
             android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textSize="60sp"
+            android:textStyle="bold"
             tools:text="5" />
 
         <Space

@@ -55,24 +55,7 @@ class RouteMonitorFragment: Fragment() {
         subscription = routeMonitor.routeObservable.subscribe(this::updateDetails)
         binding.runningTime.text = "--:--:--"
 
-        showStopButton()
-        binding.buttonStop.setOnClickListener {
-            showEndButton()
-            routeMonitor.stop()
-        }
-
-        binding.buttonResume.setOnClickListener {
-            showStopButton()
-            routeMonitor.resume()
-        }
-
-        binding.buttonEnd.setOnClickListener {
-            routeMonitor.end()?.let { route ->
-                val repository = (activity as MainActivity).repository
-                repository.insert(route)
-                findNavController().navigate(RouteMonitorFragmentDirections.endRoute())
-            }
-        }
+        setButtonBindings()
 
         arguments?.let {
             val routeName = it.getString("routeName") ?: "New Route"
@@ -85,6 +68,12 @@ class RouteMonitorFragment: Fragment() {
             } else if (routeMonitor.last != null) {
                 updateDetails(routeMonitor.last!!)
             }
+        }
+
+        if (routeMonitor.isRunning) {
+            showStopButton()
+        } else {
+            showEndButton()
         }
     }
 
@@ -101,6 +90,26 @@ class RouteMonitorFragment: Fragment() {
 
             instantSpeed.text = formatSpeed(route.path.instantSpeed)
             averageSpeed.text = formatSpeed(route.path.speed)
+        }
+    }
+
+    private fun setButtonBindings() {
+        binding.buttonStop.setOnClickListener {
+            showEndButton()
+            routeMonitor.stop()
+        }
+
+        binding.buttonResume.setOnClickListener {
+            showStopButton()
+            routeMonitor.resume()
+        }
+
+        binding.buttonEnd.setOnClickListener {
+            routeMonitor.end()?.let { route ->
+                val repository = (activity as MainActivity).repository
+                repository.insert(route)
+                findNavController().navigate(RouteMonitorFragmentDirections.endRoute())
+            }
         }
     }
 

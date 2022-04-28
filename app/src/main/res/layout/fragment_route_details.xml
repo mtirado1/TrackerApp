@@ -45,7 +45,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="30.90"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/distance_unit"
@@ -81,7 +83,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="8.20"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/average_speed_unit"
@@ -114,7 +118,9 @@
                 android:layout_height="wrap_content"
                 android:text="30:20:06"
                 android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold" />
 
             <Space
                 android:layout_width="match_parent"
@@ -140,7 +146,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="12.51"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/max_speed_unit"
