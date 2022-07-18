@@ -16,12 +16,24 @@
             android:id="@+id/active_route"
             layout="@layout/active_route" />
 
+        <TextView
+            android:id="@+id/no_saved_routes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="There are no saved routes"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            tools:text="There are no saved routes" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/route_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
-            app:layoutManager="LinearLayoutManager" />
+            app:layoutManager="LinearLayoutManager" >
+
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

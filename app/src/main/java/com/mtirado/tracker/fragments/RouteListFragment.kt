@@ -3,7 +3,6 @@ package com.mtirado.tracker.fragments
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.navigation.findNavController
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mtirado.tracker.MainActivity
 import com.mtirado.tracker.adapters.RouteListItemAdapter
 import com.mtirado.tracker.databinding.FragmentRouteListBinding
-import com.mtirado.tracker.domain.RouteMonitor
 import com.mtirado.tracker.domain.formatters.DistanceUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
 import com.mtirado.tracker.domain.formatters.UnitsFormatter
@@ -30,9 +28,7 @@ class RouteListFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Retrieve and inflate the layout for this fragment
         _binding = FragmentRouteListBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -42,7 +38,10 @@ class RouteListFragment: Fragment() {
 
         val repository = (activity as MainActivity).repository
         repository.allRoutes.asLiveData().observe(viewLifecycleOwner, Observer { routes ->
-            routes?.let { (recyclerView.adapter as RouteListItemAdapter).update(routes) }
+            routes?.let {
+                binding.noSavedRoutes.visibility = if(it.isEmpty()) View.VISIBLE else View.GONE
+                (recyclerView.adapter as RouteListItemAdapter).update(routes)
+            }
         })
 
         binding.activeRoute.activeRoute.visibility = View.GONE
@@ -62,19 +61,21 @@ class RouteListFragment: Fragment() {
     }
 
     private fun updateActiveRoute(route: Route, running: Boolean) {
-        if (running) {
-            binding.activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_menu_mylocation)
-        } else {
-            binding.activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_media_pause)
+        with(binding) {
+            if (running) {
+                activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_menu_mylocation)
+            } else {
+                activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_media_pause)
+            }
+            activeRoute.activeRoute.visibility = View.VISIBLE
+            newRouteButton.visibility = View.GONE
+            val unit = DistanceUnits.KILOMETERS
+            activeRoute.title.text = route.name
+            activeRoute.distance.text = UnitsFormatter().format(route.path.distance, unit)
+            activeRoute.unit.text = unit.toString()
+            activeRoute.duration.text = TimeFormatter().format(route.path.duration)
+            activeRoute.size.text = "(${route.path.size})"
         }
-        binding.activeRoute.activeRoute.visibility = View.VISIBLE
-        binding.newRouteButton.visibility = View.GONE
-        val unit = DistanceUnits.KILOMETERS
-        binding.activeRoute.title.text = route.name
-        binding.activeRoute.distance.text = UnitsFormatter().format(route.path.distance, unit)
-        binding.activeRoute.unit.text = unit.toString()
-        binding.activeRoute.duration.text = TimeFormatter().format(route.path.duration)
-        binding.activeRoute.size.text = "(${route.path.size})"
     }
 
     override fun onDestroyView() {
