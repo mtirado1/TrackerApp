@@ -18,3 +18,9 @@ class Angle(val value: Double) {
         }
     }
 }
+
+operator fun Angle.compareTo(other: Angle): Int = when {
+    this.value > other.value -> 1
+    this.value < other.value -> -1
+    else -> 0
+}

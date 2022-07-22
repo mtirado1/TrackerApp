@@ -34,8 +34,8 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
 
             locationRequest = LocationRequest.create().apply {
                 interval = (intervalInSeconds * 1000).toLong()
-                fastestInterval = 1000
-                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+                fastestInterval = 100
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             }
             startService()
         }

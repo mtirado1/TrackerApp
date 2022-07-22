@@ -4,7 +4,7 @@ class Path(val points: MutableList<Coordinates> = mutableListOf()) {
     val distance: Double get() = totalDistance()
     val duration: Long get() = totalTime()
     val size: Int get() = points.size
-    val speed: Double get() = distance / duration
+    val speed: Double get() = 1000 * distance / duration
     val startTime: Long get() = points.first().timestamp
     val endTime: Long get() = points.last().timestamp
 
@@ -12,7 +12,7 @@ class Path(val points: MutableList<Coordinates> = mutableListOf()) {
         if (points.size < 2) return 0.0
         val last = points.takeLast(2)
         val dt = last[1].timestamp - last[0].timestamp
-        return last[0].distanceTo(last[1]) / dt
+        return 1000 * last[0].distanceTo(last[1]) / dt
     }
 
     fun add(point: Coordinates) {
@@ -43,7 +43,9 @@ class Path(val points: MutableList<Coordinates> = mutableListOf()) {
 
     fun maxSpeed(): Double? {
         return reducePoints { start, end -> Double
-            start.distanceTo(end) / (end.timestamp - start.timestamp)
+            var duration = end.timestamp - start.timestamp
+            if (duration < 1000) duration = 1000
+            1000 * start.distanceTo(end) / duration
         }.maxOrNull()
     }
 
