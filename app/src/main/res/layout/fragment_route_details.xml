@@ -174,4 +174,9 @@
         android:insetRight="30dp"
         android:text="DELETE" />
 
+    <com.mtirado.tracker.view.CartesianView
+        android:id="@+id/cartesianView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

@@ -23,12 +23,14 @@ fun Color(r: Int, g: Int, b: Int, a: Int = 255): Int {
     return alpha or red or green or blue
 }
 
-class Plotter(private val canvas: Canvas) {
+class Plotter {
     var paint: Paint = Paint()
+    private var canvas: Canvas = Canvas()
     val width get() = canvas.width
     val height get() = canvas.height
 
-    fun draw(block: Plotter.() -> Unit) {
+    fun draw(canvas: Canvas, block: Plotter.() -> Unit) {
+        this.canvas = canvas
         this.block()
     }
 

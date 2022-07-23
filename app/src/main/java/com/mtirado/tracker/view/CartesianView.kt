@@ -10,6 +10,7 @@ import com.mtirado.tracker.domain.route.Route
 
 class CartesianView(context: Context, attributeSet: AttributeSet): View(context, attributeSet) {
     private var route: Route? = null
+    private var plotter = Plotter()
 
     fun setRoute(route: Route) {
         this.route = route
@@ -18,6 +19,14 @@ class CartesianView(context: Context, attributeSet: AttributeSet): View(context,
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        plotter.draw(canvas) {
+            stroke(Color(0,0,0), 5)
+            line(width/2, 0, width/2, height)
+            line(0, height/3, width, height/3)
+
+            fill(Color(0x10, 0x80, 0x80))
+            point(width/2, height/2, 50)
+        }
     }
 
     private fun getBounds(route: Route): CartesianBounds {
