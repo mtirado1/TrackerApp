@@ -10,9 +10,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.mtirado.tracker.MainActivity
-import com.mtirado.tracker.R
+import com.mtirado.tracker.MainViewModel
 import com.mtirado.tracker.databinding.FragmentRouteMonitorBinding
-import com.mtirado.tracker.domain.RouteMonitor
 import com.mtirado.tracker.domain.formatters.DistanceUnits
 import com.mtirado.tracker.domain.formatters.SpeedUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
@@ -23,7 +22,7 @@ class RouteMonitorFragment: Fragment() {
     private var _binding: FragmentRouteMonitorBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var routeMonitor: RouteMonitor
+    private lateinit var viewModel: MainViewModel
     private lateinit var subscription: Disposable
 
     private val unitFormatter = UnitsFormatter()
@@ -51,8 +50,8 @@ class RouteMonitorFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        routeMonitor = (activity as MainActivity).monitor
-        subscription = routeMonitor.routeObservable.subscribe(this::updateDetails)
+        viewModel = (activity as MainActivity).viewModel
+        subscription = viewModel.routeObservable.subscribe(this::updateDetails)
         binding.runningTime.text = "--:--:--"
 
         setButtonBindings()
@@ -64,13 +63,13 @@ class RouteMonitorFragment: Fragment() {
             if (!currentlyActive) {
                 val newRoute = Route.create(routeName)
                 updateDetails(newRoute)
-                routeMonitor.start(newRoute, logInterval)
-            } else if (routeMonitor.last != null) {
-                updateDetails(routeMonitor.last!!)
+                viewModel.startMonitor(newRoute, logInterval)
+            } else if (viewModel.routeObservable.value != null) {
+                updateDetails(viewModel.routeObservable.value)
             }
         }
 
-        if (routeMonitor.isRunning) {
+        if (viewModel.monitorState.isRunning) {
             showStopButton()
         } else {
             showEndButton()
@@ -81,7 +80,7 @@ class RouteMonitorFragment: Fragment() {
         with(binding) {
             routeName.text = route.name
             runningTime.text = timeFormatter.format(route.path.duration)
-            status.text = "STATUS: ${if (routeMonitor.isRunning) "RUNNING" else "STOPPED"}"
+            status.text = "STATUS: ${if (viewModel.monitorState.isRunning) "RUNNING" else "STOPPED"}"
 
             distance.text = unitFormatter.format(route.path.distance, DistanceUnits.KILOMETERS)
             latitude.text = route.lastPosition?.latitudeString ?: "- -"
@@ -96,16 +95,16 @@ class RouteMonitorFragment: Fragment() {
     private fun setButtonBindings() {
         binding.buttonStop.setOnClickListener {
             showEndButton()
-            routeMonitor.stop()
+            viewModel.stopMonitor()
         }
 
         binding.buttonResume.setOnClickListener {
             showStopButton()
-            routeMonitor.resume()
+            viewModel.resumeMonitor()
         }
 
         binding.buttonEnd.setOnClickListener {
-            routeMonitor.end()?.let { route ->
+            viewModel.endMonitor()?.let { route ->
                 val repository = (activity as MainActivity).repository
                 repository.insert(route)
                 findNavController().navigate(RouteMonitorFragmentDirections.endRoute())

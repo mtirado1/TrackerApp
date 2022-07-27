@@ -4,23 +4,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.mtirado.tracker.data.RouteRepository
 import com.mtirado.tracker.data.RoutesDatabase
 import com.mtirado.tracker.databinding.ActivityMainBinding
-import com.mtirado.tracker.domain.RouteMonitor
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private val database by lazy { RoutesDatabase.getDatabase(this) }
     val repository by lazy { RouteRepository(database.routesDao()) }
-    lateinit var monitor: RouteMonitor
-
+    val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         // Make sure actions in the ActionBar get propagated to the NavController
         setupActionBarWithNavController(navController)
-        monitor = RouteMonitor(LocationServices.getFusedLocationProviderClient(applicationContext), this)
+        viewModel.createMonitor(this)
     }
 
     override fun onSupportNavigateUp(): Boolean {

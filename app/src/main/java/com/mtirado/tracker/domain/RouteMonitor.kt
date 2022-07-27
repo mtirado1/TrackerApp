@@ -12,25 +12,20 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.mtirado.tracker.domain.route.*
 import com.mtirado.tracker.service.LocationService
-import io.reactivex.subjects.PublishSubject
 
-class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity: Activity) : Monitor<Route>, LocationCallback() {
-    private var route: Route? = null
+class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity: Activity, override val onValue: (Coordinates) -> Unit) : Monitor<Coordinates>, LocationCallback() {
+    private var coordinates: Coordinates? = null
     private var running = false
     private var interval: Int = 1
 
-    val last: Route? get() = route
-
     private lateinit var locationRequest: LocationRequest
 
-    override val routeObservable: PublishSubject<Route> = PublishSubject.create()
     override val isRunning: Boolean get() = running
 
-    override fun start(value: Route, intervalInSeconds: Int) {
+    override fun start(intervalInSeconds: Int) {
         this.interval = intervalInSeconds
         if (!running) {
             running = true
-            route = value
 
             locationRequest = LocationRequest.create().apply {
                 interval = (intervalInSeconds * 1000).toLong()
@@ -40,7 +35,6 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
             startService()
         }
     }
-
 
     override fun onLocationResult(result: LocationResult) {
         val location = result.lastLocation
@@ -52,19 +46,7 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
             timestamp = location.time
         )
 
-        println("RESULT: $coordinates")
-        this.route?.let { route ->
-            val last = route.lastPosition
-            if (last == null) {
-                route.path.add(coordinates)
-                routeObservable.onNext(route)
-            } else {
-                if (last.timestamp != coordinates.timestamp) {
-                    route.path.add(coordinates)
-                    routeObservable.onNext(route)
-                }
-            }
-        }
+        onValue(coordinates)
     }
 
     private fun startService() {
@@ -84,18 +66,13 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
 
     override fun stop()  {
         running = false
-        route?.let { route ->
-            routeObservable.onNext(route)
-        }
     }
 
-    override fun end(): Route? {
+    override fun end() {
         running = false
         locationClient.removeLocationUpdates(this)
         stopService()
-        val endValue = route
-        route = null
-        return endValue
+        coordinates = null
     }
 
     private fun startLocationUpdates() {

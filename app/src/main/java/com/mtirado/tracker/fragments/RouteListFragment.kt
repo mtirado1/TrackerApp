@@ -3,7 +3,6 @@ package com.mtirado.tracker.fragments
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -11,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mtirado.tracker.MainActivity
 import com.mtirado.tracker.adapters.RouteListItemAdapter
 import com.mtirado.tracker.databinding.FragmentRouteListBinding
+import com.mtirado.tracker.domain.RouteMonitorState
 import com.mtirado.tracker.domain.formatters.DistanceUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
 import com.mtirado.tracker.domain.formatters.UnitsFormatter
@@ -37,12 +37,12 @@ class RouteListFragment: Fragment() {
         recyclerView.adapter = RouteListItemAdapter(listOf())
 
         val repository = (activity as MainActivity).repository
-        repository.allRoutes.asLiveData().observe(viewLifecycleOwner, Observer { routes ->
+        repository.allRoutes.asLiveData().observe(viewLifecycleOwner) { routes ->
             routes?.let {
-                binding.noSavedRoutes.visibility = if(it.isEmpty()) View.VISIBLE else View.GONE
+                binding.noSavedRoutes.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
                 (recyclerView.adapter as RouteListItemAdapter).update(routes)
             }
-        })
+        }
 
         binding.activeRoute.activeRoute.visibility = View.GONE
         binding.newRouteButton.visibility = View.VISIBLE
@@ -50,9 +50,9 @@ class RouteListFragment: Fragment() {
             findNavController().navigate(RouteListFragmentDirections.viewActiveRoute())
         }
 
-        val routeMonitor = (activity as MainActivity).monitor
-        routeMonitor.last?.let { updateActiveRoute(it, routeMonitor.isRunning) }
-        subscription = routeMonitor.routeObservable.subscribe { updateActiveRoute(it, true) }
+        val viewModel = (activity as MainActivity).viewModel
+        viewModel.routeObservable.value?.let { updateActiveRoute(it, viewModel.monitorState) }
+        subscription = viewModel.routeObservable.subscribe { updateActiveRoute(it, viewModel.monitorState) }
 
         binding.newRouteButton.setOnClickListener {
             val action = RouteListFragmentDirections.actionRouteListToRouteCreation()
@@ -60,9 +60,11 @@ class RouteListFragment: Fragment() {
         }
     }
 
-    private fun updateActiveRoute(route: Route, running: Boolean) {
+    private fun updateActiveRoute(route: Route, state: RouteMonitorState) {
+        if (state == RouteMonitorState.ENDED) return
+
         with(binding) {
-            if (running) {
+            if (state.isRunning) {
                 activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_menu_mylocation)
             } else {
                 activeRoute.activeRouteIcon.setImageResource(android.R.drawable.ic_media_pause)
