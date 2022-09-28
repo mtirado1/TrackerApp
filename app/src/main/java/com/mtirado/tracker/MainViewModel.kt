@@ -10,16 +10,18 @@ import io.reactivex.subjects.BehaviorSubject
 
 class MainViewModel: ViewModel() {
      private var route: Route? = null
-     private lateinit var monitor: RouteMonitor
+     private var monitor: RouteMonitor? = null
      var routeObservable: BehaviorSubject<Route> = BehaviorSubject.create()
      val monitorState: RouteMonitorState
           get() = when {
           route == null -> RouteMonitorState.ENDED
-          monitor.isRunning -> RouteMonitorState.RUNNING
+          monitor?.isRunning == true -> RouteMonitorState.RUNNING
           else -> RouteMonitorState.PAUSED
      }
 
      fun createMonitor(activity: MainActivity) {
+          if (monitor != null) return
+
           monitor = RouteMonitor(LocationServices.getFusedLocationProviderClient(activity.applicationContext), activity) {
                monitorValueReceived(it)
           }
@@ -34,22 +36,22 @@ class MainViewModel: ViewModel() {
 
      fun startMonitor(route: Route, logInterval: Int) {
           this.route = route
-          monitor.start(logInterval)
+          monitor?.start(logInterval)
      }
 
      fun stopMonitor() {
-          monitor.stop()
+          monitor?.stop()
           route?.let {
                routeObservable.onNext(it)
           }
      }
 
      fun resumeMonitor() {
-          monitor.resume()
+          monitor?.resume()
      }
 
      fun endMonitor(): Route? {
-          monitor.end()
+          monitor?.end()
           val finalRoute = route
           route = null
           return finalRoute

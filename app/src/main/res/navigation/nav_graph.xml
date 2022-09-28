@@ -25,9 +25,6 @@
             <argument
                 android:name="logInterval"
                 android:defaultValue="0" />
-            <argument
-                android:name="active"
-                android:defaultValue="true" />
         </action>
     </fragment>
     <fragment
@@ -49,9 +46,6 @@
         <action
             android:id="@+id/action_routeCreation_to_routeMonitor"
             app:destination="@id/routeMonitorFragment" >
-            <argument
-                android:name="active"
-                android:defaultValue="false" />
         </action>
     </fragment>
     <fragment

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.mtirado.tracker.MainActivity
 import com.mtirado.tracker.MainViewModel
 import com.mtirado.tracker.databinding.FragmentRouteMonitorBinding
+import com.mtirado.tracker.domain.RouteMonitorState
 import com.mtirado.tracker.domain.formatters.DistanceUnits
 import com.mtirado.tracker.domain.formatters.SpeedUnits
 import com.mtirado.tracker.domain.formatters.TimeFormatter
@@ -59,20 +60,13 @@ class RouteMonitorFragment: Fragment() {
         arguments?.let {
             val routeName = it.getString("routeName") ?: "New Route"
             val logInterval = it.getInt("logInterval")
-            val currentlyActive = it.getBoolean("active")
-            if (!currentlyActive) {
+            if (viewModel.monitorState == RouteMonitorState.ENDED) {
                 val newRoute = Route.create(routeName)
-                updateDetails(newRoute)
                 viewModel.startMonitor(newRoute, logInterval)
+                updateDetails(newRoute)
             } else if (viewModel.routeObservable.value != null) {
                 updateDetails(viewModel.routeObservable.value)
             }
-        }
-
-        if (viewModel.monitorState.isRunning) {
-            showStopButton()
-        } else {
-            showEndButton()
         }
     }
 
@@ -89,6 +83,12 @@ class RouteMonitorFragment: Fragment() {
 
             instantSpeed.text = formatSpeed(route.path.instantSpeed)
             averageSpeed.text = formatSpeed(route.path.speed)
+
+            if (viewModel.monitorState.isRunning) {
+                showStopButton()
+            } else {
+                showEndButton()
+            }
         }
     }
 
