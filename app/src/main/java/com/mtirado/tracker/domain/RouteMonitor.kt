@@ -79,12 +79,17 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
         if (ActivityCompat.checkSelfPermission(
                 locationClient.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            ) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(
                 locationClient.applicationContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(
+                locationClient.applicationContext,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE)
+            activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), MULTIPLE_PERMISSIONS)
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -94,11 +99,10 @@ class RouteMonitor(val locationClient: FusedLocationProviderClient, val activity
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        println("Start requesting")
         locationClient.requestLocationUpdates(locationRequest, this, Looper.getMainLooper())
     }
 
     companion object {
-        private const val REQUEST_FINE_LOCATION_PERMISSIONS_REQUEST_CODE = 34
+        private const val MULTIPLE_PERMISSIONS = 100
     }
 }
